@@ -19,6 +19,8 @@ are supposed to cover all the code.
 
 Added pytest markers
 --------------------------
+- `@pytest.mark.integration_test` Marks this test as a (quick) integration test
+- `@pytest.mark.slow_integration_test` Marks this test as a slow integration test
 
 Added pytest command line options
 --------------------------
