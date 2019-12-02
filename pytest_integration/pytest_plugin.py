@@ -5,7 +5,10 @@ or slow integration tests.
 See https://github.com/jbwdevries/pytest-integration
 """
 
+import warnings
+
 import pytest
+import pytest_timeout
 
 def pytest_load_initial_conftests(early_config, parser, args):
     """
@@ -28,6 +31,10 @@ def pytest_load_initial_conftests(early_config, parser, args):
         dest='run_slow_integration')
 
     parser.addoption('--integration-cover', action='store_true')
+    parser.addoption('--integration-timeout', type=int, default=0)
+    parser.addoption(
+        '--integration-timeout-method',
+        type=_timeout_method, default='DEFAULT_METHOD')
 
 def pytest_configure(config):
     """
@@ -55,25 +62,43 @@ def pytest_collection_modifyitems(session, config, items):
 
     items.sort(key=_get_items_key)
 
-    if config.getoption('integration_cover'):
-        return
+    no_cover_marker = None
+    if not config.getoption('integration_cover'):
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error')
+            try:
+                no_cover_marker = pytest.mark.no_cover
+            except Warning:
+                pass
 
-    no_cover_found = False
-    for line in config.getini('markers'):
-        # See _pytest/mark/structures.py
-        marker = line.split(":")[0].split("(")[0].strip()
-        if marker == 'no_cover':
-            no_cover_found = True
-            break
+    timeout_marker = None
+    if config.getoption('integration_timeout') > 0:
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error')
+            try:
+                timeout_marker = pytest.mark.timeout
+            except Warning:
+                pass
 
-    if not no_cover_found:
-        # pytest-cov not installed, nothing to do here
+    if not no_cover_marker and not timeout_marker:
+        # pytest-cov and pytest-timeout not installed, or disabled
+        # nothing to do here
         return
 
     for item in items:
-        if (item.get_closest_marker('integration_test')
-                or item.get_closest_marker('slow_integration_test')):
-            item.add_marker('no_cover')
+        if item.get_closest_marker('integration_test'):
+            if no_cover_marker:
+                item.add_marker(no_cover_marker)
+
+            if timeout_marker:
+                item.add_marker(timeout_marker(
+                    timeout=config.getoption('integration_timeout'),
+                    method=config.getoption('integration_timeout_method'),
+                ))
+
+        if item.get_closest_marker('slow_integration_test'):
+            if no_cover_marker:
+                item.add_marker(no_cover_marker)
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item):
@@ -118,3 +143,12 @@ def _get_items_key(item):
         return 1
 
     return 0
+
+def _timeout_method(item):
+    if item == 'DEFAULT_METHOD':
+        return pytest_timeout.DEFAULT_METHOD
+
+    if item not in ['thread', 'signal']:
+        raise ValueError('Invalid timeout method')
+
+    return item
