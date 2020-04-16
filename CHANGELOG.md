@@ -1,6 +1,12 @@
 # Changelog
 
-## [0.2.1] - 2019-12-03
+## [0.2.2] - 2020-04-16
+
+### Fixed
+
+- Integration tests are no longer skipped on tests marked with xfail
+
+## [0.2.1] - 2020-04-13
 
 ### Fixed
 

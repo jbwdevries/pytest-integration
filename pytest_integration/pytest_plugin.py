@@ -125,7 +125,7 @@ def pytest_runtest_makereport(item, call):
     """
     if item.get_closest_marker("xfail"):
         return
-    
+
     if not call.excinfo or call.excinfo.value.__class__.__name__ == 'Skipped':
         return
 

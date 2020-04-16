@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='pytest_integration',
-    version='0.2.1',
+    version='0.2.2',
     author='Johan B.W. de Vries',
     description='Organizing pytests by integration or not',
     long_description=long_description,

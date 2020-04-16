@@ -34,3 +34,7 @@ def test_unit_testable_method_eight():
 
 def test_unit_testable_method_hundred():
     assert 100 == sut.unit_testable_method_hundred()
+
+@pytest.mark.xfail
+def test_unit_xfail():
+    assert False
