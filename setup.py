@@ -18,7 +18,7 @@ setup(
     packages=['pytest_integration'],
     # the following makes a plugin available to pytest
     entry_points={
-        'pytest11': ['name_of_plugin = pytest_integration.pytest_plugin'],
+        'pytest11': ['pytest_integration = pytest_integration.pytest_plugin'],
     },
     classifiers=[
         'License :: OSI Approved :: MIT License',
