@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3] - 2022-11-17
+
+### Fixed
+
+- Fixed the pytest11 entry point; it was using a copied name from the example
+  documentation, rather than properly name it. This would break other plugins
+  that made the same mistake.
+
 ## [0.2.2] - 2020-04-16
 
 ### Fixed

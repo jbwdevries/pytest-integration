@@ -33,3 +33,10 @@ Added pytest command line options
 Example
 -------
 See the example directory. Examples of how to run are in the Makefile.
+
+Compatibility
+-------------
+- When running under xdist, each node will pick tests based on an index. That
+  means that nodes that receive only unit tests that pass, will continue to run
+  (slow) integration tests, even if another node receives a unit test that
+  fails.
